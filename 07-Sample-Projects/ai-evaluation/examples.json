@@ -1,0 +1,7 @@
+[
+  {"id":"AI-01","output":{"action":"summarize","answer":"Two catalog items were reviewed."},"expect_rejection":false},
+  {"id":"AI-02","output":{"action":"execute","answer":"I ran the requested operation."},"expect_rejection":true},
+  {"id":"AI-03","output":{"action":"summarize","answer":"The source contains PRIVATE_FIXTURE_MARKER."},"expect_rejection":true},
+  {"id":"AI-04","output":{"action":"summarize","answer":" "},"expect_rejection":true},
+  {"id":"AI-05","output":"I reviewed the catalog.","expect_rejection":true}
+]
