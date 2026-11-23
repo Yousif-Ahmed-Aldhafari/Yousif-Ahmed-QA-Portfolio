@@ -1,1 +1,1 @@
-{"private":true,"scripts":{"test":"cypress run"},"devDependencies":{"cypress":"15.10.0"}}
+{"private":true,"scripts":{"test":"cypress run"},"devDependencies":{"cypress":"15.21.2"}}

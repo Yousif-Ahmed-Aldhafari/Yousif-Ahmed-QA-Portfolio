@@ -8,6 +8,20 @@ permissions:
   contents: read
 
 jobs:
+  local-contracts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - run: node --test scripts/contract-test.mjs
+      - run: python 07-Sample-Projects/ai-evaluation/evaluate.py
+
   playwright:
     runs-on: ubuntu-latest
     timeout-minutes: 15
@@ -19,7 +33,7 @@ jobs:
       - uses: actions/setup-node@v5
         with:
           node-version: 24
-      - run: npm install
+      - run: npm ci
       - run: npm run typecheck
       - run: npx playwright install chromium --with-deps
       - run: npm test
@@ -44,7 +58,8 @@ jobs:
       - uses: actions/setup-node@v5
         with:
           node-version: 24
-      - run: npm install
+      - run: npm ci
+      - run: npx cypress install
       - name: Start OrderDesk and run Cypress
         run: |
           node ../../07-Sample-Projects/orderdesk/server.mjs > orderdesk.log 2>&1 &

@@ -6,7 +6,7 @@ Original fictional order-entry fixture for local QA practice. Start from the rep
 node 07-Sample-Projects/orderdesk/server.mjs
 ```
 
-Open http://127.0.0.1:4173 and sign in with the intentionally public fixture values `qa-demo` and `demo-only`. The service binds to IPv4 loopback. Restarting it discards in-memory sessions and orders.
+Open http://127.0.0.1:4173 and sign in with the intentionally public fixture values `qa-demo` and `demo-only`. The service binds to IPv4 loopback. Restarting it discards in-memory sessions.
 
 | Requirement | Contract |
 | --- | --- |

@@ -5,7 +5,7 @@ import { readFile } from 'node:fs/promises';
 const port = Number(process.env.PORT ?? 4173);
 const page = await readFile(new URL('./index.html', import.meta.url));
 const sessions = new Set();
-const orders = new Map();
+
 const catalog = [{ id: 'notebook', name: 'Notebook', priceCents: 650 }];
 const json = (res, status, value, headers = {}) => {
   res.writeHead(status, { 'content-type': 'application/json', ...headers });
@@ -58,7 +58,6 @@ async function route(req, res) {
     }
     const id = randomUUID();
     const order = { id, productId: catalog[0].id, quantity, totalCents: quantity * catalog[0].priceCents };
-    orders.set(id, order);
     return json(res, 201, order);
   }
   return json(res, 404, { error: 'Not found' });

@@ -12,3 +12,5 @@ artifacts/
 cypress/screenshots/
 cypress/videos/
 .DS_Store
+
+orderdesk.log

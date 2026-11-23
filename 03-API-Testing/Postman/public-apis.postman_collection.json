@@ -124,7 +124,29 @@
       ]
     },
     {
-      "name": "API-06 Sign in as public demo user",
+      "name": "API-06 Missing bearer token",
+      "request": {
+        "method": "GET",
+        "url": "{{authBaseUrl}}/auth/me",
+        "auth": {
+          "type": "noauth"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 401', () => pm.response.to.have.status(401));",
+              "pm.test('Explains missing authorization', () => pm.expect(pm.response.json().message).to.be.a('string').and.not.be.empty);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "API-07 Sign in as public demo user",
       "request": {
         "method": "POST",
         "url": "{{authBaseUrl}}/auth/login",
@@ -154,7 +176,7 @@
       ]
     },
     {
-      "name": "API-07 Read authenticated identity",
+      "name": "API-08 Read authenticated identity",
       "request": {
         "method": "GET",
         "url": "{{authBaseUrl}}/auth/me",
@@ -178,25 +200,6 @@
               "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
               "pm.test('Demo identity matches', () => pm.expect(pm.response.json().username).to.equal('emilys'));",
               "pm.collectionVariables.unset('accessToken');"
-            ]
-          }
-        }
-      ]
-    },
-    {
-      "name": "API-08 Missing bearer token",
-      "request": {
-        "method": "GET",
-        "url": "{{authBaseUrl}}/auth/me"
-      },
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "type": "text/javascript",
-            "exec": [
-              "pm.test('HTTP 401', () => pm.response.to.have.status(401));",
-              "pm.test('Explains missing authorization', () => pm.expect(pm.response.json().message).to.be.a('string').and.not.be.empty);"
             ]
           }
         }
