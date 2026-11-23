@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OrderDesk</title>
+<style>
+  body {font: 1rem system-ui; margin: 0; background:#eef3f8; color:#172b44}
+  main {max-width: 36rem; margin: 3rem auto; padding: 1.5rem; background:white; border-radius:1rem}
+  label, button, input {display:block; margin:.6rem 0; font:inherit}
+  button {background:#1455a0; color:white; border:0; padding:.65rem 1rem; border-radius:.4rem}
+  input {max-width:95%; padding:.4rem; border:1px solid #596e87}
+  :focus-visible {outline:3px solid #925512; outline-offset:3px}
+  @media (max-width: 40rem) {main {margin: 1rem}}
+</style>
+<main>
+<h1>OrderDesk</h1>
+<form id="login">
+  <h2>Sign in</h2>
+  <label>Username <input name="username" required autocomplete="username"></label>
+  <label>Password <input name="password" required type="password" autocomplete="current-password"></label>
+  <button>Sign in</button>
+</form>
+<form id="order" hidden>
+  <h2>Place an order</h2>
+  <p id="product"></p>
+  <label>Quantity <input name="quantity" type="number" min="1" max="10" required></label>
+  <button>Submit order</button>
+</form>
+<p role="status" id="feedback"></p>
+</main>
+<script type="module">
+const login = document.querySelector('#login');
+const order = document.querySelector('#order');
+const feedback = document.querySelector('#feedback');
+const post = (path, body) => fetch(path, {
+  method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body)
+});
+login.addEventListener('submit', async event => {
+  event.preventDefault();
+  try {
+    const response = await post('/api/session', Object.fromEntries(new FormData(login)));
+    if (!response.ok) {
+      feedback.textContent = (await response.json()).error;
+      return;
+    }
+    const catalogResponse = await fetch('/api/catalog');
+    if (!catalogResponse.ok) throw new Error('Catalog unavailable');
+    const [product] = await catalogResponse.json();
+    document.querySelector('#product').textContent = product.name;
+    login.hidden = true;
+    order.hidden = false;
+    order.elements.quantity.focus();
+    feedback.textContent = 'Signed in';
+  } catch {
+    feedback.textContent = 'Unable to sign in. Try again.';
+  }
+});
+order.addEventListener('submit', async event => {
+  event.preventDefault();
+  const button = order.querySelector('button');
+  button.disabled = true;
+  try {
+    const response = await post('/api/orders', { quantity: order.elements.quantity.valueAsNumber });
+    const result = await response.json();
+    feedback.textContent = response.ok
+      ? `Order submitted. Total: $${(result.totalCents / 100).toFixed(2)}`
+      : result.error;
+  } catch {
+    feedback.textContent = 'Unable to confirm the order.';
+  } finally {
+    button.disabled = false;
+  }
+});
+</script>
+</html>
