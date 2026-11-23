@@ -1,0 +1,232 @@
+{
+  "info": {
+    "name": "QA Portfolio | Public Demo APIs",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "API-01 Read post",
+      "request": {
+        "method": "GET",
+        "url": "{{postsBaseUrl}}/posts/1"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+              "const schema = {type:'object',required:['id','title','body','userId'],properties:{id:{type:'integer'},title:{type:'string'},body:{type:'string'},userId:{type:'integer'}}};",
+              "pm.test('Post contract', () => pm.response.to.have.jsonSchema(schema));",
+              "pm.test('Correct record', () => pm.expect(pm.response.json().id).to.equal(1));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "API-02 Create post",
+      "request": {
+        "method": "POST",
+        "url": "{{postsBaseUrl}}/posts",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"title\": \"Portfolio fixture\", \"body\": \"Synthetic data\", \"userId\": 1}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 201', () => pm.response.to.have.status(201));",
+              "const schema = {type:'object',required:['id','title','body','userId'],properties:{id:{type:'integer'},title:{type:'string'},body:{type:'string'},userId:{type:'integer'}}};",
+              "pm.test('Create contract', () => pm.response.to.have.jsonSchema(schema));",
+              "pm.test('Echoes title', () => pm.expect(pm.response.json().title).to.equal('Portfolio fixture'));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "API-03 Update post",
+      "request": {
+        "method": "PATCH",
+        "url": "{{postsBaseUrl}}/posts/1",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"title\": \"Updated title\"}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+              "pm.test('Updated title', () => pm.expect(pm.response.json()).to.include({id:1,title:'Updated title'}));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "API-04 Delete post",
+      "request": {
+        "method": "DELETE",
+        "url": "{{postsBaseUrl}}/posts/1"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+              "pm.test('Empty result', () => pm.expect(pm.response.json()).to.deep.equal({}));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "API-05 Missing post",
+      "request": {
+        "method": "GET",
+        "url": "{{postsBaseUrl}}/posts/999999"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 404', () => pm.response.to.have.status(404));",
+              "pm.test('No record returned', () => pm.expect(pm.response.json()).to.deep.equal({}));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "API-06 Sign in as public demo user",
+      "request": {
+        "method": "POST",
+        "url": "{{authBaseUrl}}/auth/login",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"username\": \"emilys\", \"password\": \"emilyspass\"}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+              "pm.test('Bearer token returned', () => pm.expect(pm.response.json().accessToken).to.be.a('string').and.not.be.empty);",
+              "if (pm.response.code === 200 && pm.response.json().accessToken) pm.collectionVariables.set('accessToken', pm.response.json().accessToken);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "API-07 Read authenticated identity",
+      "request": {
+        "method": "GET",
+        "url": "{{authBaseUrl}}/auth/me",
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{accessToken}}",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+              "pm.test('Demo identity matches', () => pm.expect(pm.response.json().username).to.equal('emilys'));",
+              "pm.collectionVariables.unset('accessToken');"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "API-08 Missing bearer token",
+      "request": {
+        "method": "GET",
+        "url": "{{authBaseUrl}}/auth/me"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 401', () => pm.response.to.have.status(401));",
+              "pm.test('Explains missing authorization', () => pm.expect(pm.response.json().message).to.be.a('string').and.not.be.empty);"
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "pm.test('Response within configured budget', () => pm.expect(pm.response.responseTime).to.be.below(Number(pm.variables.get('maxResponseMs'))));",
+          "pm.test('JSON content type', () => pm.expect(pm.response.headers.get('Content-Type')).to.match(/application\\/json/i));"
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "postsBaseUrl",
+      "value": "https://jsonplaceholder.typicode.com"
+    },
+    {
+      "key": "authBaseUrl",
+      "value": "https://dummyjson.com"
+    },
+    {
+      "key": "maxResponseMs",
+      "value": "3000"
+    }
+  ]
+}

@@ -1,0 +1,86 @@
+name: QA checks
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+
+jobs:
+  playwright:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: 02-Automation-Testing/Playwright
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+      - run: npm install
+      - run: npm run typecheck
+      - run: npx playwright install chromium --with-deps
+      - run: npm test
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-evidence
+          path: |
+            02-Automation-Testing/Playwright/playwright-report/
+            02-Automation-Testing/Playwright/test-results/
+      - if: failure()
+        run: echo 'Playwright failed. Review the failing step and available report artifacts.' >> "$GITHUB_STEP_SUMMARY"
+
+  cypress:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: 02-Automation-Testing/Cypress
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+      - run: npm install
+      - name: Start OrderDesk and run Cypress
+        run: |
+          node ../../07-Sample-Projects/orderdesk/server.mjs > orderdesk.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+          curl --silent --show-error --fail --retry-all-errors --retry 15 --retry-delay 1 http://127.0.0.1:4173/health
+          npm test
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cypress-evidence
+          path: |
+            02-Automation-Testing/Cypress/artifacts/
+            02-Automation-Testing/Cypress/cypress/screenshots/
+            02-Automation-Testing/Cypress/orderdesk.log
+      - if: failure()
+        run: echo 'Cypress failed. Review the failing step, JUnit report, and screenshots when present.' >> "$GITHUB_STEP_SUMMARY"
+
+  public-api:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    if: github.event_name == 'workflow_dispatch'
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+      - run: mkdir -p artifacts
+      - run: |
+          npx --yes newman@6.2.1 run 03-API-Testing/Postman/public-apis.postman_collection.json \
+            -e 03-API-Testing/Postman/public-apis.postman_environment.json \
+            --timeout-request 10000 --reporters cli,junit --reporter-junit-export artifacts/api-junit.xml
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: public-api-evidence
+          path: artifacts/
+      - if: failure()
+        run: echo 'Public API checks failed. Review Newman output and provider availability.' >> "$GITHUB_STEP_SUMMARY"
