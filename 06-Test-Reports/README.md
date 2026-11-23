@@ -12,7 +12,12 @@ Local runs on 23 November 2026 used Linux x86-64, Node.js 24.22.3 and Python 3.1
 | Newman | Eight requests completed. 26 of 34 assertions passed. | All eight response-time checks exceeded the 3-second budget. Status, schema, media-type, body and authorization assertions passed after moving the unauthenticated check before sign-in. |
 | k6 smoke | All configured thresholds passed. | [Performance results](#performance-results) and [raw summary](../assets/reports/k6-smoke.json). |
 | AI-output evaluator | Five fixtures produced the expected rubric decisions. | [Dataset and evaluator](../07-Sample-Projects/ai-evaluation/README.md). |
-| GitHub Actions | Workflow YAML checked locally. Hosted execution pending. | [Workflow](../.github/workflows/qa.yml). |
+
+## GitHub-hosted verification
+
+The [first hosted run](https://github.com/Yousif-Ahmed-Aldhafari/Yousif-Ahmed-QA-Portfolio/actions/runs/45159358902) stopped before Playwright tests because Chromium installation was unsupported on Ubuntu 26.04 with the pinned Playwright version. Commit `4691d5e` pins the Playwright runner to Ubuntu 24.04.
+
+The [successful rerun](https://github.com/Yousif-Ahmed-Aldhafari/Yousif-Ahmed-QA-Portfolio/actions/runs/45170831244) completed Chromium installation and passed all 10 Playwright tests, 3 Cypress tests and the local-contracts job. The public API job was skipped on this push because it runs on manual dispatch.
 
 ## Performance results
 
@@ -42,4 +47,4 @@ The authenticated order path passed automated checks. The reload behavior is an 
 - [x] Tracked files and commit path history reviewed for personal documents, private references and sensitive artifacts. Public demo credentials are intentionally scoped to fixtures.
 - [x] npm audit reports zero known findings for locked Playwright and Cypress dependencies at review time.
 - [x] Observed results, pending execution and environment blocks recorded above.
-- [ ] GitHub-hosted runs verified after publication.
+- [x] GitHub-hosted push workflow verified. Public API execution is dispatched separately.

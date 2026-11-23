@@ -21,6 +21,17 @@ I design risk-based test coverage for web, mobile and API products. My work span
 
 ![OrderDesk displays a successful two-item order and a total of $13.00](assets/screenshots/orderdesk-confirmation.png)
 
+## QA results at a glance
+
+| Execution | Passed | Failed | Blocked or skipped |
+| --- | ---: | ---: | --- |
+| [GitHub-hosted push workflow](https://github.com/Yousif-Ahmed-Aldhafari/Yousif-Ahmed-QA-Portfolio/actions/runs/45170831244) | 3 jobs | 0 | 1 job skipped by design |
+| [OrderDesk manual HTTP checks](01-Manual-Testing/Test-Execution/README.md) | 6 cases | 0 | 5 browser cases blocked |
+| [Local Newman run](06-Test-Reports/README.md) | 26 assertions | 8 assertions | 0 |
+| [Local k6 run](06-Test-Reports/README.md#performance-results) | 1 workload | 0 | 4 workloads unrun |
+
+The eight Newman failures were response-time budget misses. The k6 result covers smoke only. **Release decision:** OrderDesk is suitable for QA demonstrations. Release sign-off remains pending manual browser validation and disposition of the open [session reload defect](01-Manual-Testing/Bug-Reports/README.md).
+
 ## About my QA work
 
 - Built and maintained **120+ automated regression scenarios** using Cypress, Playwright and Selenium.
@@ -29,7 +40,7 @@ I design risk-based test coverage for web, mobile and API products. My work span
 - Reduced repetitive regression testing effort by **35%**.
 - Expanded test coverage across high-risk user journeys by **30%**.
 
-These are professional achievements documented in my QA résumé. Results for the independent projects here are recorded in the [verification report](06-Test-Reports/README.md).
+The 250+ figure covers manual and automated cases for web and mobile products in the documented role. The 70+ figure covers detailed Jira reports in that role. The 120+ figure counts automated regression scenarios and is not added to the test-case total. These figures describe professional work. See the [verification report](06-Test-Reports/README.md) for portfolio execution results.
 
 ## Skills and repository navigation
 
